@@ -1,0 +1,153 @@
+/* En vue de disposer de plus de GPIO, on a décidé de se passer des messages de debug
+ * via le port série. On a donc commenter toutes les instructions d'affichage 
+ *
+ * 
+ */
+
+#include <Arduino.h>
+
+#include "esp_camera.h"
+#include <WiFi.h>
+#include <Wire.h>
+
+#include <lwip/sockets.h>
+#include <esp_log.h>
+#include <string.h>
+#include <errno.h>
+#include "sdkconfig.h"
+#include "esp_cam_libZ.hpp"
+#include <Tcp_server.hpp>
+#include "vehicle.hpp"
+
+ const char* ssid = "ALPHA224";
+ const char* password = "CROYANCE214@@";
+
+//const char* ssid = "UnivCasa";
+//const char* password = "";
+
+/* Série de define pour les lignes de commande de la voiture */
+// Lignes de commande du moteur gauche
+#define LEFT_FRONT_LINE 4    // Etait initialement à 4, mais le 4 est connecté en interne au flashlight
+#define LEFT_BACK_LINE 02
+#define LEFT_PWM_LINE 14
+
+// Ligne de commande du moteur droit
+#define RIGHT_FRONT_LINE 15
+#define RIGHT_BACK_LINE 13
+#define RIGHT_PWM_LINE 12
+
+//int sock;
+//char address[] = "192.168.43.187";
+#define PORT_NUMBER 50885
+#define WIDTH 320
+#define HEIGHT 240
+
+void printData(uint8_t data);
+
+EspCamLib camera;
+
+TcpServer *server;
+
+Vehicle myCar;                /* Instantiation d'un objet de la classe Vehicle */
+
+
+void setup() {
+  Serial.begin(9600);
+  Serial.setDebugOutput(true);
+  Serial.println();
+
+  camera.begin();
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
+
+
+  Serial.print("Camera Ready at ");
+  Serial.print(WiFi.localIP());
+  Serial.println();
+
+  server = new TcpServer;
+  server->setOnDataFunc(printData);
+  server->start("", PORT_NUMBER);
+  delay(2000);
+
+  /* Configuration et initialisation des paramètres du véhicule */
+  myCar.setLeftFrontLine(LEFT_FRONT_LINE);
+  myCar.setLeftBackLine(LEFT_BACK_LINE);
+  myCar.setLeftMotorPWMLine(LEFT_PWM_LINE);
+
+  myCar.setRightFrontLine(RIGHT_FRONT_LINE);
+  myCar.setRightBackLine(RIGHT_BACK_LINE);
+  myCar.setRightMotorPWMLine(RIGHT_PWM_LINE);
+
+  myCar.begin();    // Initialisation des paramètres de la voiture
+
+  camera_fb_t *pic = NULL; 
+
+  Serial.printf("En attente de connexion d'un client!\n");
+  while(!server->isClientConnected());
+
+  /* Si on arrive ici, c'est qu'un client s'est connecté */
+
+  myCar.setVelocity(180);
+  myCar.rideFront();
+  delay(1000);
+  myCar.turnLeft();
+  delay(1000);
+  myCar.rideFront();
+  delay(1000);
+  myCar.turnRight();
+  delay(1000);
+  myCar.rideBack();
+  delay(1500);
+  myCar.brake();
+  
+  while(1);       // A retirer après le test mouvement de la voiture
+
+  camera.setFrameSize(taille::VGA);
+  while(1){
+    //pic = esp_camera_fb_get();
+    camera.getFrame(&pic);
+    if(pic != NULL){
+          if(server->isClientConnected()){
+            server->sendAsByteArray(pic->len);
+            server->sendData((char *)pic->buf, pic->len);
+            Serial.printf("%u octets envoyés\n", pic->len);
+          }
+          else
+            Serial.printf("Client non connecté!\n");
+          
+          esp_camera_fb_return(pic);
+          //delay(50);
+        //}
+    }
+    //delay(100);
+  }
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  delay(10000);
+  
+}
+
+void printData(uint8_t data){
+  Serial.printf("Byte received: %u\n", data);
+  switch(data){
+    case 72: myCar.turnLeft();  break;
+    case 73: myCar.turnRight(); break;
+    case 74: myCar.brake();     break;
+
+    case 76: myCar.rideFront(); break;
+    case 77: myCar.rideBack();  break;
+    case 78: myCar.brake();     break;
+
+    default: break;   /* On devrait pas arriver ici */
+  }
+}
