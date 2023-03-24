@@ -1,0 +1,1 @@
+Les images dont le nom se termine '_' sont les originales, les autres étant celle dont l'arrière-plan a été retirée

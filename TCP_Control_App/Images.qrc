@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Images/lJoystick_left.png</file>
+        <file>Images/lJoystick_none.png</file>
+        <file>Images/lJoystick_right.png</file>
+        <file>Images/rJoystick_down.png</file>
+        <file>Images/rJoystick_none.png</file>
+        <file>Images/rJoystick_up.png</file>
+        <file>Images/menu.png</file>
+        <file>Images/Logo_ENSEM.gif</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>LJoystick.qml</file>
+        <file>RJoystick.qml</file>
+        <file>MainFrame.qml</file>
+    </qresource>
+</RCC>
