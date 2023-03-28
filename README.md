@@ -16,4 +16,6 @@ The pression on the buttons triggering the sending of fixed bytes of messages to
 ## The server side code
 Provided in this repo, is the code written in C++ under Platformio for an-ESP32 driven 4-wheeled robot. It only handles the communication with the server, as all the mechanisms related to motion control were taken care of by an Arduino Nano. All the bytes relative to motion control received by the ESP32 are forwarded to the Arduino Nano through an I2C connection. (Arduino code not included in the repo).  
 
-In the actual state of the project, it quickly occurs that TCP is not really suitable for real-time video streaming purpose, as it requires great bandwidth and other resources. So, next time, implement the streaming component using UDP while maintaining the control side in TCP.
+In the actual state of the project, it quickly occurs that TCP is not really suitable for real-time video streaming purpose, as it requires great bandwidth and other resources. So, next time, implement the streaming component using UDP while maintaining the control side in TCP.  
+
+Project demo link: https://youtu.be/ipp_EQQPbHI
