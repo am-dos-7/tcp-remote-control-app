@@ -19,5 +19,5 @@ Provided in this repo, is the code written in C++ under Platformio for an-ESP32 
 In the actual state of the project, it quickly occurs that TCP is not really suitable for real-time video streaming purpose, as it requires great bandwidth and other resources. So, next time, implement the streaming component using UDP while maintaining the control side in TCP.  
 
 Project demo links: 
-- https://youtu.be/ipp_EQQPbHI
-- https://youtu.be/PWa0z4nPr-U
+- Test with a four-wheeled robot: https://youtu.be/PWa0z4nPr-U
+- Test with a Lamborghini: https://youtu.be/ipp_EQQPbHI
